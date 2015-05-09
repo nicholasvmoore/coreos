@@ -1,0 +1,20 @@
+[Unit]
+Description=Influxdb for Heapster https://github.com/GoogleCloudPlatform/heapster
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=10m
+Environment=""
+Restart=always
+ExecStartPre=-/usr/bin/docker kill %n
+ExecStartPre=-/usr/bin/docker rm -f %n
+ExecStartPre=/usr/bin/docker pull kubernetes/heapster_influxdb:latest
+ExecStart=/usr/bin/docker run --name %n -P=true kubernetes/heapster_influxdb:latest
+ExecStop=/usr/bin/docker stop -t 2 %n
+ExecStopPost=/usr/bin/docker rm -f %n
+
+[Install]
+WantedBy=multi-user.target
+
+[X-Fleet]

@@ -1,0 +1,87 @@
+#cloud-config
+
+users:
+  - name: nicholas
+    passwd: $1$ano67B90.8An8Femn5fV9Y2EfpX8.B0
+    coreos-ssh-import-github: nicholasvmoore
+    groups:
+      - sudo
+      - docker
+      - systemd-journal
+  - name: root
+    passwd: $1$ktmeWWyg$UZN.YGuSViBYmpYLjrHsl.  
+write-files:
+  - path: /etc/conf.d/nfs
+    permissions: '0644'
+    content: |
+      OPTS_RPC_MOUNTD=""
+coreos:
+  update:
+    reboot-strategy: best-effort
+    group: alpha
+  etcd2:
+    discovery: https://discovery.etcd.io/b677819a8e58f1422cf4e1ac6d719fea
+    advertise-client-urls: http://192.168.200.80:2380
+    initial-advertise-peer-urls: http://192.168.200.80:2380
+    listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
+    listen-peer-urls: http://192.168.200.80:2380,http://192.168.200.80:7001
+  units:
+    - name: etcd2.service
+      command: start
+      enable: true
+    - name: rpc-statd.service
+      command: start
+      enable: true
+    - name: mnt-lun0-media.mount
+      command: start
+      content: |
+        [Mount]
+        What=192.168.200.40:/mnt/lun0/media
+        Where=/mnt/lun0/media
+        Type=nfs
+    - name: mnt-lun0-software.mount
+      command: start
+      content: |
+        [Mount]
+        What=192.168.200.40:/mnt/lun0/software
+        Where=/mnt/lun0/software
+        Type=nfs
+    - name: 20-networkd.network
+      command: start
+      content: |
+        [Match]
+        Name=en*
+
+        [Network]
+        DHCP=yes
+
+        [DHCP]
+        UseDNS=true
+        UseNTP=true
+        UseHostname=true
+        UseDomains=true
+    - name: cadvisor.service
+      command: start
+      content: |
+        [Unit]
+        Description=cAdvisor
+        After=rpcbind.service
+        After=docker.service
+        After=mnt-lun0-media.mount
+        After=mnt-lun0-software.mount
+        Requires=docker.service
+        Requires=rpcbind.service
+        Requires=mnt-lun0-media.mount
+        Requires=mnt-lun0-software.mount
+
+        [Service]
+        TimeoutStartSec=0
+        Restart=always
+        KillMode=none
+        ExecStartPre=-/usr/bin/docker stop cadvisor
+        ExecStartPre=-/usr/bin/docker rm cadvisor
+        ExecStart=/usr/bin/docker run   --volume=/:/rootfs:ro   --volume=/var/run:/var/run:rw   --volume=/sys:/sys:ro   --volume=/var/lib/docker/:/var/lib/docker:ro   --publish=58080:8080   --name=cadvisor   google/cadvisor:latest
+        ExecStop=/usr/bin/docker stop cadvisor
+
+        [Install]
+        WantedBy=multi-user.target
