@@ -1,17 +1,28 @@
 [Unit]
-Description=cAdvisor Service
+Description=Heapster Service
 After=docker.service
 Requires=docker.service
+Requires=heapster-oneshot.service
+BindsTo=heapster-oneshot.service
 
 [Service]
 TimeoutStartSec=10m
+EnvironmentFile=/etc/conf.d/heapster
 Restart=always
-ExecStartPre=-/usr/bin/docker kill cadvisor
-ExecStartPre=-/usr/bin/docker rm -f cadvisor
-ExecStartPre=/usr/bin/docker pull google/cadvisor
-ExecStart=/usr/bin/docker run --volume=/:/rootfs:ro --volume=/var/run:/var/run:rw --volume=/sys:/sys:ro --volume=/var/lib/docker/:/var/lib/docker:ro --publish=4194:4194 --name=cadvisor --net=host google/cadvisor:latest --logtostderr --port=4194
-ExecStop=/usr/bin/docker stop -t 2 cadvisor
+ExecStartPre=-/usr/bin/docker kill %n
+ExecStartPre=-/usr/bin/docker rm -f %n
+ExecStartPre=/usr/bin/docker pull kubernetes/heapster:latest
+ExecStart=/usr/bin/docker run \
+         /usr/bin/heapster \
+         --sink influxdb \
+         --sink_influxdb_host=${INFLUXDB_HOST} \
+         --sink_influxdb_name=${INFLUXDB_NAME} \
+         --sink_influxdb_username=${INFLUXDB_USERNAME} \
+         --sink_influxdb_password=${INFLUXDB_PASSWORD} \ 
+         --coreos \
+         --fleet_endpoints=${FLEET_ENDPOINTS} \
+         --cadvisor_port=${CADVISOR_PORT}
+          kubernetes/heapster:latest
+ExecStop=/usr/bin/docker stop -t 2 %n
 
 [X-Fleet]
-Global=true
-MachineMetadata=role=kubernetes
