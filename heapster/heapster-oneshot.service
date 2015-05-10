@@ -11,6 +11,7 @@ ExecStart=/bin/sh -c '/usr/bin/echo INFLUXDB_HOST=$(/usr/bin/etcdctl get /produc
                       /usr/bin/echo INFLUXDB_PASSWORD=$(/usr/bin/etcdctl get /production/heapster/influxdb_password) >> /etc/conf.d/heapster; \
                       /usr/bin/echo INFLUXDB_NAME=$(/usr/bin/etcdctl get /production/heapster/influxdb_name) >> /etc/conf.d/heapster; \
                       /usr/bin/echo CADVISOR_PORT=$(/usr/bin/etcdctl get /production/heapster/cadvisor_port) >> /etc/conf.d/heapster;'
+RemainAfterExit=yes
 
 [Install]
 WantedBy=multi-user.target
