@@ -2,6 +2,10 @@ Heapster
 =========
 Helpful documents for heapster, I foudn the documentation for Heapster lacking in many areas, partly due to my coreos cluster running on VMWare and partly due to heapster being more widely deployed on kubernetes.
 
+Volumes
+-------
+If you need your data to persist to disk, not saying that it's entirely necessary due to the fact that it's only statiscal information stored for only 7 days. You should map a volume to to container's /data directory.
+
 Docker Run
 -------------
 Heapster needs to have access to etcd in order to query it for the fleet hosts within the hidden directory _coreos.com/.  Because it assumes that etcd is running on the host it defaults to 127.0.0.1:4001. However, we're running Heapster in a container and within the container 127.0.0.1:4001 is serviced by nothing. You can do this two ways that I see, host networking or set a runtime flag. Below are two examples.
