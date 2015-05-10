@@ -10,7 +10,7 @@ Restart=always
 ExecStartPre=-/usr/bin/docker kill %n
 ExecStartPre=-/usr/bin/docker rm -f %n
 ExecStartPre=/usr/bin/docker pull kubernetes/heapster_influxdb:latest
-ExecStart=/usr/bin/docker run --name %n -P=true kubernetes/heapster_influxdb:latest
+ExecStart=/usr/bin/docker run --name %n -p 8083:8083 -p 8086:8086 kubernetes/heapster_influxdb:latest
 ExecStop=/usr/bin/docker stop -t 2 %n
 ExecStopPost=/usr/bin/docker rm -f %n
 
