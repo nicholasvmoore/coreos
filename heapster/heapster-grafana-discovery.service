@@ -1,12 +1,11 @@
 [Unit]
-Description=Announce Influxdb for heapster
-BindsTo=influxdb-heapster.service
-After=influxdb-heapster.service
+Description=Announce grafana for heapster
+BindsTo=heapster-grafana.service
+After=heapster-grafana.service
 
 [Service]
 ExecStart=/bin/sh -c "while true; do \
-          /usr/bin/etcdctl set /production/heapster/influxdb-api `hostname`.pdx4.rlgeex.net:$(echo $(/usr/bin/docker port influxdb-heapster.service 8086) | cut -d ':' -f2) --ttl 60; \
-          /usr/bin/etcdctl set /production/heapster/influxdb-webui `hostname`.pdx4.rlgeex.net:$(echo $(/usr/bin/docker port influxdb-heapster.service 8083) | cut -d ':' -f2) --ttl 60; \
+          /usr/bin/etcdctl set /production/heapster/grafana-webui `hostname`.pdx4.rlgeex.net:$(echo $(/usr/bin/docker port heapster-grafana.service 80) | cut -d ':' -f2) --ttl 60; \
           /usr/bin/sleep 45; \
           done"
 
@@ -14,4 +13,4 @@ ExecStart=/bin/sh -c "while true; do \
 WantedBy=multi-user.target
 
 [X-Fleet]
-MachineOf=influxdb-heapster.service
+MachineOf=heapster-grafana.service
