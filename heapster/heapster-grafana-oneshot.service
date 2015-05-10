@@ -1,0 +1,18 @@
+[Unit]
+Description=Heapster one-shot service to create the EnvironmentFile
+After=etcd.service
+Requires=etcd.service
+
+[Service]
+ExecStartPre=-/bin/sh -c '/usr/bin/rm -f /etc/conf.d/heapster'
+ExecStartPre=-/bin/sh -c '/usr/bin/touch /etc/conf.d/heapster'
+ExecStart=/bin/sh -c '/usr/bin/echo INFLUXDB_HOST=$(/usr/bin/etcdctl get /production/heapster/influxdb-api) > /etc/conf.d/heapster; \
+                      /usr/bin/echo INFLUXDB_USERNAME=$(/usr/bin/etcdctl get /production/heapster/influxdb_username) >> /etc/conf.d/heapster; \
+                      /usr/bin/echo INFLUXDB_PASSWORD=$(/usr/bin/etcdctl get /production/heapster/influxdb_password) >> /etc/conf.d/heapster; \
+                      /usr/bin/echo INFLUXDB_NAME=$(/usr/bin/etcdctl get /production/heapster/influxdb_name) >> /etc/conf.d/heapster; \
+                      /usr/bin/echo CADVISOR_PORT=$(/usr/bin/etcdctl get /production/heapster/cadvisor_port) >> /etc/conf.d/heapster;'
+
+[Install]
+WantedBy=multi-user.target
+
+[X-Fleet]

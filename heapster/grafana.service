@@ -1,0 +1,29 @@
+[Unit]
+Description=Heapster Service
+After=docker.service
+Requires=docker.service
+After=heapster-oneshot.service
+
+[Service]
+TimeoutStartSec=10m
+EnvironmentFile=/etc/conf.d/heapster
+Restart=always
+ExecStartPre=-/usr/bin/docker kill %n
+ExecStartPre=-/usr/bin/docker rm -f %n
+ExecStartPre=-/usr/bin/docker pull kubernetes/heapster:latest
+ExecStart=/usr/bin/docker run -P=true -p 8082 --name %n kubernetes/heapster:latest /usr/bin/heapster \
+    --coreos \
+    --cadvisor_port=${CADVISOR_PORT} \
+    --fleet_endpoints=http://192.168.200.90:4001,http://192.168.200.91:4001,http://192.168.200.92:4001,http://192.168.200.93:4001 \
+    --sink influxdb \
+    --sink_influxdb_host=${INFLUXDB_HOST} \
+    --sink_influxdb_name=${INFLUXDB_NAME} \
+    --sink_influxdb_username=${INFLUXDB_USERNAME} \
+    --sink_influxdb_password=${INFLUXDB_PASSWORD} \ 
+ExecStop=/usr/bin/docker stop -t 2 %n
+
+[Install]
+WantedBy=multi-user.target
+
+[X-Fleet]
+MachineOf=heapster-oneshot.service
