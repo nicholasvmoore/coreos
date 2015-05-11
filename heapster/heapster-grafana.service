@@ -3,6 +3,7 @@ Description=Heapster Service
 After=docker.service
 Requires=docker.service
 After=heapster-grafana-oneshot.service
+Requires=heapster-grafana-oneshot.service
 
 [Service]
 TimeoutStartSec=10m

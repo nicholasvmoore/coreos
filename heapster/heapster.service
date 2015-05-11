@@ -3,6 +3,7 @@ Description=Heapster Service
 After=docker.service
 Requires=docker.service
 After=heapster-oneshot.service
+Requires=heapster-oneshot.service
 
 [Service]
 TimeoutStartSec=10m
@@ -21,6 +22,7 @@ ExecStart=/usr/bin/docker run -P=true -p 8082 --name %n kubernetes/heapster:late
     --sink_influxdb_username=${INFLUXDB_USERNAME} \
     --sink_influxdb_password=${INFLUXDB_PASSWORD} \ 
 ExecStop=/usr/bin/docker stop -t 2 %n
+RemainAfterExit=yes
 
 [Install]
 WantedBy=multi-user.target
