@@ -1,0 +1,75 @@
+#cloud-config
+
+groups:
+  - systemd-journal
+  - rkt
+users:
+  - name: nicholas
+    passwd: $1$ano67B90$9An8Femn5fV9Y2EfpX8.B0
+    coreos-ssh-import-github: nicholasvmoore
+    groups:
+      - sudo
+      - docker
+      - systemd-journal
+      - rkt
+  - name: root
+    passwd: $1$ktmeWWyg$UZN.YGuSViBYmpYLjrHsl.  
+write-files:
+  - path: /etc/conf.d/nfs
+    permissions: '0644'
+    content: |
+      OPTS_RPC_MOUNTD=""
+coreos:
+  update:
+    reboot-strategy: best-effort
+    group: stable
+  etcd:
+    name: core00
+    discovery: https://discovery.etcd.io/fa2743b670dbb9b68a8e026e3842f584
+    addr: 192.168.200.90:4001
+    peer-addr: 192.168.200.90:7001
+  units:
+    - name: etcd.service
+      command: start
+      enable: true
+    - name: fleet.service
+      command: start
+      enable: true
+    - name: rpc-statd.service
+      command: start
+      enable: true
+    - name: mnt-lun0-media.mount
+      command: start
+      content: |
+        [Mount]
+        What=192.168.200.40:/mnt/lun0/media
+        Where=/mnt/lun0/media
+        Type=nfs
+    - name: mnt-lun0-software.mount
+      command: start
+      content: |
+        [Mount]
+        What=192.168.200.40:/mnt/lun0/software
+        Where=/mnt/lun0/software
+        Type=nfs
+    - name: mnt-lun0-home.mount
+      command: start
+      content: |
+        [Mount]
+        What=192.168.200.40:/mnt/lun0/home
+        Where=/mnt/lun0/home
+        Type=nfs
+    - name: 20-networkd.network
+      command: start
+      content: |
+        [Match]
+        Name=en*
+
+        [Network]
+        DHCP=yes
+
+        [DHCP]
+        UseDNS=true
+        UseNTP=true
+        UseHostname=true
+        UseDomains=true
