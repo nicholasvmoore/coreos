@@ -52,6 +52,13 @@ coreos:
         What=192.168.200.40:/mnt/lun0/software
         Where=/mnt/lun0/software
         Type=nfs
+    - name: mnt-lun0-home.mount
+      command: start
+      content: |
+        [Mount]
+        What=192.168.200.40:/mnt/lun0/home
+        Where=/mnt/lun0/home
+        Type=nfs
     - name: 20-networkd.network
       command: start
       content: |
