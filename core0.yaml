@@ -1,8 +1,5 @@
 #cloud-config
 
-groups:
-  - systemd-journal
-  - rkt
 users:
   - name: nicholas
     passwd: $1$ano67B90$9An8Femn5fV9Y2EfpX8.B0
@@ -63,7 +60,7 @@ coreos:
       command: start
       content: |
         [Match]
-        Name=en*
+        Name=enp6s0
 
         [Network]
         DHCP=yes
