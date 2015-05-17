@@ -8,7 +8,6 @@ users:
       - sudo
       - docker
       - systemd-journal
-      - rkt
   - name: root
     passwd: $1$ktmeWWyg$UZN.YGuSViBYmpYLjrHsl.  
 write-files:
@@ -21,7 +20,7 @@ coreos:
     reboot-strategy: best-effort
     group: stable
   etcd:
-    name: core00
+    name: core0
     discovery: https://discovery.etcd.io/fa2743b670dbb9b68a8e026e3842f584
     addr: 192.168.200.90:4001
     peer-addr: 192.168.200.90:7001
@@ -60,7 +59,7 @@ coreos:
       command: start
       content: |
         [Match]
-        Name=enp6s0
+        Name=en*
 
         [Network]
         DHCP=yes
