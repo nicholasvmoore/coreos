@@ -3,7 +3,8 @@
 users:
   - name: nicholas
     passwd: $1$ano67B90$9An8Femn5fV9Y2EfpX8.B0
-    coreos-ssh-import-github: nicholasvmoore
+    ssh-authorized-keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC+hifeug/un38/AtJd5Y0LzUXHF9pSlwSBcQt5qXW7zHDeiLyRC+NmxLlK3CL+IihNBYw3pYKTHKIERcPHeRE4g8Qzjg3gDWV6vSRDD0XAO/5rCJT31vvez98z4E5rKXPQ7lh8ZAX50Olg1zzip7UKAKMfkq5JfNx6ZLAawNaiTa9lHTKlsRnVPtMZIw1DWIwjJSpvKHr/OVU+RZUiVPJM/JKqfI+KHB/r4npn18R6tPGhYcvbQShhKetl6RHMLn2YQPCpmfoe5c0C5CJM0MV+hasalf/QDEz60bOcHX4MrhPdAcXZ/i+69zAcOLZfHh4UbSs5BaAXg2yu0C0fAmDZ
     groups:
       - sudo
       - docker
@@ -17,59 +18,112 @@ write-files:
       OPTS_RPC_MOUNTD=""
 coreos:
   update:
-    reboot-strategy: best-effort
+    reboot-strategy: reboot
     group: stable
-  etcd:
-    name: core0
-    discovery: https://discovery.etcd.io/fa2743b670dbb9b68a8e026e3842f584
-    addr: 192.168.200.90:4001
-    peer-addr: 192.168.200.90:7001
   units:
-    - name: etcd.service
-      command: start
-      enable: true
-    - name: fleet.service
-      command: start
-      enable: true
     - name: rpc-statd.service
+      runtime: true
       command: start
       enable: true
-    - name: mnt-lun0-media.mount
+    - name: mnt-lun0-home.mount
+      runtime: true
       command: start
       content: |
+        [Install]                                                                                                                                                                                        
+        After=rpcbind.service
+        Requires=rpcbind.service
+        Wants=remote-fs-pre.target
+
         [Mount]
-        What=192.168.200.40:/mnt/lun0/media
-        Where=/mnt/lun0/media
+        What=192.168.200.40:/mnt/lun0/home
+        Where=/mnt/lun0/home
         Type=nfs
+
+        [Install]
+        WantedBy=multi-user.target
     - name: mnt-lun0-software.mount
+      runtime: true
       command: start
       content: |
+        [Install]                                                                                                                                                                                        
+        After=rpcbind.service
+        Requires=rpcbind.service
+        Wants=remote-fs-pre.target
+
         [Mount]
         What=192.168.200.40:/mnt/lun0/software
         Where=/mnt/lun0/software
         Type=nfs
-    - name: mnt-lun0-home.mount
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: mnt-lun0-media.mount
+      runtime: true
       command: start
       content: |
+        [Install]                                                                                                                                                                                        
+        After=rpcbind.service
+        Requires=rpcbind.service
+        Wants=remote-fs-pre.target
+
         [Mount]
-        What=192.168.200.40:/mnt/lun0/home
-        Where=/mnt/lun0/home
+        What=192.168.200.40:/mnt/lun0/media
+        Where=/mnt/lun0/media
         Type=nfs
+
+        [Install]
+        WantedBy=multi-user.target
     - name: mnt-lun0-home.mount                                                                                                                                                                  
+      runtime: true
       command: start
       content: |
         [Mount]
         What=192.168.200.40:/mnt/lun0/home
         Where=/mnt/lun0/home
         Type=nfs
-    - name: 20-networkd.network
+    - name: mnt-usb0-libvirt.mount
+      runtime: true
       command: start
+      content: |
+        [Install]
+        Wants=local-fs.target
+
+        [Mount]
+        What=UUID=14a64389-2e47-49e8-a36b-7b766d8c2a4d
+        Where=/mnt/usb0/libvirt
+        Options=subvol=libvirt,compress=lzo,discard
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: br0.netdev
+      runtime: true
+      content: |
+        [NetDev]                                                                                                                                                                                         
+        Name=br0
+        Kind=bridge
+        MACAddress=00:50:56:00:00:80
+    - name: br0.network
+      runtime: true
+      content: |
+        [Match]                                                                                                                                                                                          
+        Name=br0
+
+        [Network]
+        DHCP=yes
+
+        [DHCP]
+        UseDNS=true
+        UseNTP=true
+        UseHostname=true
+        UseDomains=true
+    - name: 20-networkd.network
+      runtime: true
       content: |
         [Match]
         Name=en*
 
         [Network]
-        DHCP=yes
+        Bridge=br0
 
         [DHCP]
         UseDNS=true
