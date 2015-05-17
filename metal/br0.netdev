@@ -1,0 +1,4 @@
+[NetDev]
+Name=br0
+Kind=bridge
+MACAddress=00:50:56:00:00:80

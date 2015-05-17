@@ -1,0 +1,11 @@
+[Match]
+Name=br0
+
+[Network]
+DHCP=yes
+
+[DHCP]
+UseDNS=true
+UseNTP=true
+UseHostname=true
+UseDomains=true
