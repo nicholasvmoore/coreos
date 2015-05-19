@@ -12,7 +12,7 @@ Restart=always
 ExecStartPre=-/usr/bin/docker kill %n
 ExecStartPre=-/usr/bin/docker rm -f %n
 ExecStartPre=-/usr/bin/docker pull kubernetes/heapster:latest
-ExecStart=/usr/bin/docker run -P=true -p 8082 --name %n kubernetes/heapster:latest /usr/bin/heapster \
+ExecStart=/usr/bin/docker run --rm -P=true -p 8082 --name %n kubernetes/heapster:latest /usr/bin/heapster \
     --coreos \
     --cadvisor_port=${CADVISOR_PORT} \
     --fleet_endpoints=http://192.168.200.90:4001,http://192.168.200.91:4001,http://192.168.200.92:4001,http://192.168.200.93:4001 \

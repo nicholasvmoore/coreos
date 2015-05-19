@@ -12,7 +12,7 @@ Restart=always
 ExecStartPre=-/usr/bin/docker kill %n
 ExecStartPre=-/usr/bin/docker rm -f %n
 ExecStartPre=-/usr/bin/docker pull kubernetes/heapster_grafana:latest
-ExecStart=/usr/bin/docker run -P=true -p 80 \
+ExecStart=/usr/bin/docker run --rm -P=true -p 80 \
           -e INFLUXDB_HOST=${INFLUXDB_HOST} \
           -e INFLUXDB_PORT=${INFLUXDB_PORT} \
           -e INFLUXDB_USER=${INFLUXDB_USER} \
