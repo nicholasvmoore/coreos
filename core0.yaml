@@ -144,3 +144,15 @@ coreos:
 
         [Install]
         WantedBy=multi-user.target
+    - name: cpu-governor.service
+      command: start
+      runtime: true
+      content: |
+        [Unit]
+        Description=Enable CPU power saving
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=/usr/sbin/modprobe cpufreq_powersave
+        ExecStart=/usr/bin/sh -c '/usr/bin/echo "powersave" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor'
