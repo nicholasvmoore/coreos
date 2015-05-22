@@ -25,106 +25,6 @@ coreos:
       runtime: true
       command: start
       enable: true
-    - name: mnt-lun0-home.mount
-      runtime: true
-      command: start
-      content: |
-        [Install]                                                                                                                                                                                        
-        After=rpcbind.service
-        Requires=rpcbind.service
-        Wants=remote-fs-pre.target
-
-        [Mount]
-        What=192.168.200.40:/mnt/lun0/home
-        Where=/mnt/lun0/home
-        Type=nfs
-
-        [Install]
-        WantedBy=multi-user.target
-   - name: mnt-lun0.mount
-      runtime: true
-      command: start
-      content: |
-        [Install]
-        Wants=local-fs.target
-
-        [Mount]
-        What=UUID=b2302f04-5707-47af-8c52-ee4a16f09948
-        Where=/mnt/lun0/
-        Options=subvol=lun0
-
-        [Install]
-        WantedBy=multi-user.target
-   - name: mnt-lun0-media.mount
-      runtime: true
-      command: start
-      content: |
-        [Install]
-        Wants=local-fs.target
-
-        [Mount]
-        What=UUID=b2302f04-5707-47af-8c52-ee4a16f09948
-        Where=/mnt/lun0/media
-        Options=subvol=media
-
-        [Install]
-        WantedBy=multi-user.target
-   - name: mnt-lun0-home.mount
-      runtime: true
-      command: start
-      content: |
-        [Install]
-        Wants=local-fs.target
-
-        [Mount]
-        What=UUID=b2302f04-5707-47af-8c52-ee4a16f09948
-        Where=/mnt/lun0/home
-        Options=subvol=home,compress=lzo
-
-        [Install]
-        WantedBy=multi-user.target
-   - name: mnt-lun0-software.mount
-      runtime: true
-      command: start
-      content: |
-        [Install]
-        Wants=local-fs.target
-
-        [Mount]
-        What=UUID=b2302f04-5707-47af-8c52-ee4a16f09948
-        Where=/mnt/lun0/home
-        Options=subvol=software,compress=lzo
-
-        [Install]
-        WantedBy=multi-user.target
-   - name: mnt-lun0-pictures.mount
-      runtime: true
-      command: start
-      content: |
-        [Install]
-        Wants=local-fs.target
-
-        [Mount]
-        What=UUID=b2302f04-5707-47af-8c52-ee4a16f09948
-        Where=/mnt/lun0/home
-        Options=subvol=pictures
-
-        [Install]
-        WantedBy=multi-user.target
-   - name: mnt-usb0-libvirt.mount
-      runtime: true
-      command: start
-      content: |
-        [Install]
-        Wants=local-fs.target
-
-        [Mount]
-        What=UUID=14a64389-2e47-49e8-a36b-7b766d8c2a4d
-        Where=/mnt/usb0/libvirt
-        Options=subvol=libvirt,compress=lzo,discard
-
-        [Install]
-        WantedBy=multi-user.target
     - name: br0.netdev
       runtime: true
       content: |
@@ -160,3 +60,87 @@ coreos:
         UseNTP=true
         UseHostname=true
         UseDomains=true
+    - name: mnt-usb0-libvirt.mount
+      runtime: true
+      command: start
+      content: |
+        [Install]
+        Wants=local-fs.target
+
+        [Mount]
+        What=UUID=14a64389-2e47-49e8-a36b-7b766d8c2a4d
+        Where=/mnt/usb0/libvirt
+        Options=subvol=libvirt,compress=lzo,discard
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: mnt-lun0.mount
+      runtime: true
+      command: start
+      content: |
+        [Install]
+        Wants=local-fs.target
+
+        [Mount]
+        What=UUID=b2302f04-5707-47af-8c52-ee4a16f09948
+        Where=/mnt/lun0
+        Options=subvol=lun0
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: mnt-lun0-home.mount
+      runtime: true
+      command: start
+      content: |
+        [Install]
+        Wants=local-fs.target
+
+        [Mount]
+        What=UUID=b2302f04-5707-47af-8c52-ee4a16f09948
+        Where=/mnt/lun0/home
+        Options=subvol=lun0/home,compress=lzo
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: mnt-lun0-media.mount
+      runtime: true
+      command: start
+      content: |
+        [Install]
+        Wants=local-fs.target
+
+        [Mount]
+        What=UUID=b2302f04-5707-47af-8c52-ee4a16f09948
+        Where=/mnt/lun0/media
+        Options=subvol=lun0/media
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: mnt-lun0-pictures.mount
+      runtime: true
+      command: start
+      content: |
+        [Install]
+        Wants=local-fs.target
+
+        [Mount]
+        What=UUID=b2302f04-5707-47af-8c52-ee4a16f09948
+        Where=/mnt/lun0/pictures
+        Options=subvol=lun0/pictures
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: mnt-lun0-software.mount
+      runtime: true
+      command: start
+      content: |
+        [Install]
+        Wants=local-fs.target
+
+        [Mount]
+        What=UUID=b2302f04-5707-47af-8c52-ee4a16f09948
+        Where=/mnt/lun0/software
+        Options=subvol=lun0/software,compress=lzo
+
+        [Install]
+        WantedBy=multi-user.target
