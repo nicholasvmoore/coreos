@@ -1,0 +1,22 @@
+[Unit]
+Description=libvirtd
+After=rpcbind.service
+After=docker.service
+After=mnt-usb0-libvirt.mount
+Requires=docker.service
+Requires=mnt-usb0-libvirt.mount
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/usr/bin/docker stop libvirtd
+ExecStartPre=-/usr/bin/docker rm -f libvirtd
+ExecStart=/bin/sh -c '/usr/bin/docker run --name libvirtd --privileged --net=host -i -e \'container=docker\' \
+-v /proc/modules:/proc/modules -v /mnt/usb0/libvirt/:/var/lib/libvirt/ \
+-v /mnt/lun0/:/mnt/lun0 \
+-p 5900:5900 \
+-v /sys/fs/cgroup:/sys/fs/cgroup:rw libvirtd'
+ExecStop=/usr/bin/docker stop libvirtd
+
+[Install]
+WantedBy=multi-user.target

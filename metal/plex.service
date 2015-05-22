@@ -1,0 +1,25 @@
+[Unit]
+Description=Plex Media Server
+After=rpcbind.service
+After=docker.service
+After=mnt-lun0-media.mount
+After=mnt-lun0-software.mount
+Requires=docker.service
+Requires=rpcbind.service
+Requires=mnt-lun0-media.mount
+Requires=mnt-lun0-software.mount
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/usr/bin/docker kill plex
+ExecStartPre=-/usr/bin/docker rm plex
+ExecStart=/usr/bin/docker run --rm -v /mnt/lun0/media:/media:ro -v /mnt/lun0/software/docker/plex:/var/lib/plexmediaserver/:rw --name="plex" --net=host nicholasvmoore/docker-plex
+ExecStop=/usr/bin/docker stop plex
+
+[Install]
+WantedBy=multi-user.target
+
+[X-Fleet]
+Conflicts=plex*
+MachineMetadata=cores=4

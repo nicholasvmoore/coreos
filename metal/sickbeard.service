@@ -1,0 +1,21 @@
+[Unit]
+Description=SickBeard
+After=rpcbind.service
+After=docker.service
+After=mnt-lun0-media.mount
+After=mnt-lun0-software.mount
+Requires=docker.service
+Requires=rpcbind.service
+Requires=mnt-lun0-media.mount
+Requires=mnt-lun0-software.mount
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/usr/bin/docker stop sickbeard
+ExecStartPre=-/usr/bin/docker rm sickbeard
+ExecStart=/usr/bin/docker run --rm -v /mnt/lun0/software/docker/tv/:/config:rw -v /mnt/lun0/media:/media:rw -p 8081:8081 --name=sickbeard nicholasvmoore/docker-sickbeard
+ExecStop=/usr/bin/docker stop sickbeard
+
+[Install]
+WantedBy=multi-user.target
