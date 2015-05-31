@@ -15,7 +15,11 @@ write-files:
   - path: /etc/conf.d/nfs
     permissions: '0644'
     content: |
-      OPTS_RPC_MOUNTD=""
+      OPTS_RPC_MOUNTD="-N 2 -N 3"
+  - path: /etc/exports
+    permissions: '0644'
+    content: |
+      /mnt/lun0 192.168.200.0/24(rw,fsid=0,no_root_squash,sync)
 coreos:
   update:
     reboot-strategy: reboot
@@ -23,6 +27,18 @@ coreos:
   units:
     - name: rpc-statd.service
       runtime: true
+      command: start
+      enable: true
+    - name: nfsd.service
+      command: start
+      enable: true
+    - name: rpc-idmapd.service
+      command: start
+      enable: true
+    - name: rpc-mountd.service
+      command: start
+      enable: true
+    - name: rpc-statd.service
       command: start
       enable: true
     - name: br0.netdev
